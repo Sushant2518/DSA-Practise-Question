@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <title>Web24-C3</title>
+    <style>
+      #navbar>div{
+        display: flex;
+        justify-content: space-around;
+      }
+      #navbar>h2{
+        text-align: center;
+      }
+      #create{
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        align-items: center;
+      }
+      #user_form{
+        display: flex;
+        flex-direction: column;
+        width: 30%;
+        height: 300px;
+        justify-content: space-between;
+       
+      }
+      #user_form input,select{
+       height: 35px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar">
+      <h2>Masai Task List</h2>
+      <div>
+        <a href="./index.html">
+          <h2>Home</h2>
+        </a>
+        <a href="./dashboard.html">
+          <h2>Dashboard</h2>
+        </a>
+        <a href="./Progress.html">
+          <h2>In-Progress</h2>
+        </a>
+        <a href="./Done.html">
+          <h2>Done</h2>
+        </a>
+      </div>
+    </div>
+    <div id="create">
+      <h1>Create A Task</h1>
+      <form id="user_form" >
+        <input id="name" placeholder="Task Name" type="text" />
+        <input id="desc" placeholder="Description" type="text" />
+        <label for="">Start Date:-</label>
+        <input type="date" id="start" />
+        <label for="">End Date:-</label>
+        <input type="date" id="end" />
+        <select id="priority">
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+  </body>
+  <script src="./Scripts/index.js"></script>
+</html>
