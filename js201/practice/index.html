@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page</title>
+    <style>
+      main{
+        display: flex;
+      }
+      #product-container {
+        width: 100%;
+        /* border: 1px solid red; */
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 30px;
+        /* justify-content: center; */
+      }
+      #product-container div{
+        width: 90%;
+        /* border: 1px solid green; */
+        margin: auto;
+      }
+      #product-container > div img{
+        width: 100%;
+      }
+     
+    </style>
+  </head>
+
+  <body>
+    <div class="nav">
+      <h1>Web E-Commerce</h1>
+      <a href="./index.html">Home</a>
+      <a href="./cart.html">Cart</a>
+    </div>
+    <h1 id="alert"></h1>
+    <main>
+      <div id="filter">
+        <div id="brand-filter">
+          <h2>Filter By Brands</h2>
+          <div>
+            <input type="checkbox" id="roadster" />
+            <p>Roadster</p>
+          </div>
+          <div>
+            <input type="checkbox" id="blackberrys" />
+            <p>Blackberrys</p>
+          </div>
+          <div>
+            <input type="checkbox" id="van-heusen" />
+            <p>Van Heusen</p>
+          </div>
+          <div>
+            <input type="checkbox" id="allen-solly" />
+            <p>Allen Solly</p>
+          </div>
+          <div>
+            <input type="checkbox" id="twills" />
+            <p>Twills</p>
+          </div>
+        </div>
+        <div id="category-filter">
+          <h2>Filter By Categories</h2>
+          <div>
+            <input type="checkbox" id="men" />
+            <p>Men</p>
+          </div>
+          <div>
+            <input type="checkbox" id="women" />
+            <p>Women</p>
+          </div>
+          <div>
+            <input type="checkbox" id="homedecor" />
+            <p>Homedecor</p>
+          </div>
+          <div>
+            <input type="checkbox" id="kids" />
+            <p>Kids</p>
+          </div>
+        </div>
+      </div>
+      <div id="product-container">
+        <div>
+          <!-- Here Append All the Products  -->
+        </div>
+      </div>
+    </main>
+  </body>
+  <script type="module">
+    
+    let api = "https://dbioz2ek0e.execute-api.ap-south-1.amazonaws.com/mockapi/get-products";
+    
+    let fetched = [];
+    let filteredProducts = [];
+    fetchData()
+    async function fetchData(){
+      try{
+        let response = await fetch(api);
+        let data = await response.json();
+
+        fetched = data.data;
+        console.log(fetched);
+        displayData(fetched);
+        // applyFilters(fetched) 
+      }
+      catch(error){
+        console.log(error);
+      }
+    }
+
+    let productContainer = document.querySelector("#product-container");
+    let cart = JSON.parse(localStorage.getItem("cart"))||[];
+
+    function displayData(data){
+      productContainer.innerHTML="";
+
+      data.forEach(function(element){
+        let card = document.createElement("div");
+        
+        let imgEle = document.createElement("img");
+        imgEle.setAttribute("src",element.image);
+
+        let titleEle = document.createElement("h2");
+        titleEle.innerText=element.title;
+
+        let brandEle = document.createElement("p");
+        brandEle.innerText=element.brand;
+
+        let categoryEle = document.createElement("p");
+        categoryEle.innerText = element.category;
+
+        let priceEle = document.createElement("p");
+        priceEle.innerText=element.price;
+
+        let addToCart = document.createElement("button");
+        addToCart.innerText="Add To Cart";
+
+        addToCart.addEventListener("click",()=>{
+          if(checkDuplicate(element)){
+            alert("Product already in cart");
+          }
+          else{
+            cart.push({...element,quantity : 1});
+            localStorage.setItem("cart",JSON.stringify(cart));
+            alert("Product added to the cart");
+          }
+        })
+
+
+        card.append(imgEle,titleEle,brandEle,categoryEle,priceEle,addToCart);
+        productContainer.append(card);
+      })
+    }
+
+    function checkDuplicate(element){
+      for(let i=0; i<=cart.length-1; i++){
+        if(cart[i].id==element.id){
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const brandFilters = document.querySelectorAll(
+      "#brand-filter input[type='checkbox']"
+    );
+    const categoryFilters = document.querySelectorAll(
+      "#category-filter input[type='checkbox']"
+    );
+    
+    brandFilters.forEach(checkbox => checkbox.addEventListener('change', applyFilters));
+    categoryFilters.forEach(checkbox => checkbox.addEventListener('change', applyFilters));
+
+    function getCheckedValues() {
+      const checkedValues = { brands: [], categories: [] };
+      brandFilters.forEach(checkbox => {
+        if (checkbox.checked) checkedValues.brands.push(checkbox.value);
+      });
+      categoryFilters.forEach(checkbox => {
+        if (checkbox.checked) checkedValues.categories.push(checkbox.value);
+      });
+      return checkedValues;
+    }
+
+    function applyFilters() {
+      const checkedValues = getCheckedValues();
+      filteredProducts = fetched.filter(product => {
+        if (checkedValues.brands.length && !checkedValues.brands.includes(product.brand)) {
+          return false;
+        }
+        if (checkedValues.categories.length && !checkedValues.categories.includes(product.category)) {
+          return false;
+        }
+        return true;
+      });
+      displayData(filteredProducts);
+
+    }
+    // displayData(fetched);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // 1. Create an array of products
+// let products = [
+//   { brand: 'Roadster', category: 'Men', name: 'T-shirt', price: 500 },
+//   { brand: 'Blackberrys', category: 'Men', name: 'Shirt', price: 1000 },
+//   { brand: 'Levi\'s', category: 'Women', name: 'Jeans', price: 1500 },
+//   { brand: 'Vero Moda', category: 'Women', name: 'Top', price: 800 },
+//   { brand: 'Roadster', category: 'Women', name: 'Dress', price: 1200 },
+// ];
+
+// // 2. Create event listeners for checkboxes
+// const brandCheckboxes = document.querySelectorAll('#brand-filter input[type="checkbox"]');
+// const categoryCheckboxes = document.querySelectorAll('#category-filter input[type="checkbox"]');
+// brandCheckboxes.forEach(checkbox => checkbox.addEventListener('change', applyFilters));
+// categoryCheckboxes.forEach(checkbox => checkbox.addEventListener('change', applyFilters));
+
+// // 3. Get checked values and add them to an array
+// function getCheckedValues() {
+//   const checkedValues = { brands: [], categories: [] };
+//   brandCheckboxes.forEach(checkbox => {
+//     if (checkbox.checked) checkedValues.brands.push(checkbox.value);
+//   });
+//   categoryCheckboxes.forEach(checkbox => {
+//     if (checkbox.checked) checkedValues.categories.push(checkbox.value);
+//   });
+//   return checkedValues;
+// }
+
+// // 4. Filter the products array based on the checked values
+// function applyFilters() {
+//   const checkedValues = getCheckedValues();
+//   const filteredProducts = products.filter(product => {
+//     if (checkedValues.brands.length && !checkedValues.brands.includes(product.brand)) {
+//       return false;
+//     }
+//     if (checkedValues.categories.length && !checkedValues.categories.includes(product.category)) {
+//       return false;
+//     }
+//     return true;
+//   });
+
+//   // 5. Display the filtered products on the page
+//   displayProducts(filteredProducts);
+// }
+
+// // Function to display products on the page
+// function displayProducts(products) {
+//   const productList = document.querySelector('#product-list');
+//   productList.innerHTML = '';
+//   products.forEach(product => {
+//     const productElement = document.createElement('div');
+//     productElement.classList.add('product');
+//     productElement.innerHTML = `
+//       <div class="product-info">
+//         <h3>${product.brand} ${product.name}</h3>
+//         <p>Category: ${product.category}</p>
+//         <p>Price: Rs.${product.price}</p>
+//       </div>
+//     `;
+//     productList.appendChild(productElement);
+//   });
+// }
+
+// // Display all products initially
+// displayProducts(products);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // function displayData(data){
+    //   let cardList = `
+    //     ${data.map((element)=>{
+    //       return card(
+    //           element.image,
+    //           element.title,
+    //           element.brand,
+    //           element.category,
+    //           element.price
+    //       );
+    //     }).join("")}
+    //   `
+    //   productContainer.innerHTML = cardList;
+    // }
+
+    // function card(image, title, brand, category, price, id){
+    //     let card = `
+    //     <div class="card-item">
+    //       <img src="${image}" alt="error">
+    //       <p id="title">${title}</p>
+    //       <p id="brand">${brand}</p>
+    //       <p id="category">${category}</p>
+    //       <p id="price">${price}</p>
+    //       <button id="addToCart">Add to Cart</button>
+    //     </div>
+    //     `
+    //     return card;
+    // }
+
+    // const brandFilters = document.querySelectorAll(
+    //   "#brand-filter input[type='checkbox']"
+    // );
+    // const categoryFilters = document.querySelectorAll(
+    //   "#category-filter input[type='checkbox']"
+    // );
+    // let filteredProducts = [];
+
+
+  </script>
+</html>
+<!-- brand
+: 
+"roadster"
+category
+: 
+"men"
+id
+: 
+1
+image
+: 
+"https://picsum.photos/200"
+price
+: 
+844
+title
+: 
+"cotton Checked Casual Shirt" -->

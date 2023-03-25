@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart Page</title>
+    <style>
+      /* All Your css for Cart page goes here  */
+      main{
+        display: flex;
+      }
+      #product-container div{
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <h1>Web E-Commerce</h1>
+      <a href="./index.html">Home</a>
+      <a href="./cart.html">Cart</a>
+    </div>
+    <h1 id="total">
+      Your total order value is :- <span id="cart-total">0</span>
+    </h1>
+    <div id="cart-container">
+      <!-- Here Append All the Cart Cards here-->
+    </div>
+  </body>
+  <script type="module">
+    let cart = JSON.parse(localStorage.getItem("cart"))||[];
+
+    let productContainer = document.querySelector("#cart-container");
+    
+    displayData(cart);
+    function displayData(data){
+      productContainer.innerHTML="";
+
+      data.forEach(function(element){
+        let card = document.createElement("div");
+        
+        let imgEle = document.createElement("img");
+        imgEle.setAttribute("src",element.image);
+
+        let titleEle = document.createElement("h2");
+        titleEle.innerText=element.title;
+
+        let brandEle = document.createElement("p");
+        brandEle.innerText=element.brand;
+
+        let categoryEle = document.createElement("p");
+        categoryEle.innerText = element.category;
+
+        let priceEle = document.createElement("p");
+        priceEle.innerText=element.price;
+
+    
+        card.append(imgEle,titleEle,brandEle,categoryEle,priceEle);
+        productContainer.append(card);
+      })
+    }
+  </script>
+</html>
